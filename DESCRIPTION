@@ -5,8 +5,9 @@ Authors@R:
     person("Al", "Martin", , "almartin@example.com", role = c("aut", "cre"))
 Description: Downloads and processes school data from the Maine Department of
     Education (DOE). Provides functions for fetching enrollment data from the
-    Data Warehouse and transforming it into tidy format for analysis. Supports
-    historical data from 2003 to present.
+    Maine DOE Data Warehouse and transforming it into tidy format for analysis.
+    Data is available from 2016 to present, based on Annual October 1 certified
+    enrollment data sets.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -51,30 +51,34 @@ standardize_grade <- function(grade) {
 
 #' Get available years for Maine enrollment data
 #'
-#' Returns a vector of years for which enrollment data is available from the
-#' Maine Department of Education. Data is available from 2003 to present.
+#' Returns the range of years for which enrollment data is available.
+#' Maine DOE Data Warehouse has data from 2016 to present.
 #'
-#' @return Integer vector of available years
+#' Data is sourced exclusively from the Maine Department of Education (DOE)
+#' Data Warehouse, which provides Annual October 1 certified enrollment data.
+#'
+#' @return Named list with min_year, max_year, source info, and available years
 #' @export
 #' @examples
 #' get_available_years()
 get_available_years <- function() {
-  # Maine DOE Data Warehouse has data from approximately 2003 onward
+  # Maine DOE Data Warehouse has data from 2016 onward
+  # (metadata shows "SchoolYearCode > 2015")
+  # Data source: https://www.maine.gov/doe/data-warehouse/reporting/enrollment
 
-  # The Excel files contain historical data with year columns
-  # Most complete data is from 2003 to current year
   current_year <- as.integer(format(Sys.Date(), "%Y"))
 
-  # If we're past October, include current school year
+  # If we're past October, current school year data may be available
   current_month <- as.integer(format(Sys.Date(), "%m"))
-  if (current_month >= 10) {
-    max_year <- current_year + 1
-  } else {
-    max_year <- current_year
-  }
+  max_year <- if (current_month >= 10) current_year + 1 else current_year
 
-  # Maine DOE has reliable data from 2003 (earlier data may be inconsistent)
-  2003:max_year
+  list(
+    min_year = 2016L,
+    max_year = max_year,
+    source = "Maine DOE Data Warehouse",
+    url = "https://www.maine.gov/doe/data-warehouse/reporting/enrollment",
+    note = "Data available from 2016 to present. Based on Annual October 1 certified data sets."
+  )
 }
 
 
@@ -86,18 +90,37 @@ get_available_years <- function() {
 #' @return TRUE if valid, otherwise throws an error
 #' @keywords internal
 validate_year <- function(end_year) {
-  available <- get_available_years()
-  min_year <- min(available)
-  max_year <- max(available)
+  avail <- get_available_years()
 
-  if (!end_year %in% available) {
+  if (!is.numeric(end_year) || length(end_year) != 1) {
+    stop("end_year must be a single numeric value")
+  }
+
+  if (end_year < avail$min_year || end_year > avail$max_year) {
     stop(paste0(
-      "end_year must be between ", min_year, " and ", max_year, ". ",
-      "Got: ", end_year
+      "end_year must be between ", avail$min_year, " and ", avail$max_year,
+      "\nAvailable years: ", avail$min_year, "-", avail$max_year,
+      "\nNote: ", avail$note
     ))
   }
 
   TRUE
+}
+
+
+
+
+#' Clean school/district names
+#'
+#' Standardizes school and district names by removing extra whitespace.
+#'
+#' @param x Character vector of names
+#' @return Cleaned character vector
+#' @keywords internal
+clean_names <- function(x) {
+  x <- trimws(x)
+  x <- gsub("\\s+", " ", x)  # Multiple spaces to single
+  x
 }
 
 

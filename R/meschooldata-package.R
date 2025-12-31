@@ -29,24 +29,23 @@
 #' }
 #'
 #' @section Data Sources:
-#' Data is sourced from the Maine Department of Education Data Warehouse:
+#' Data is sourced exclusively from the Maine DOE Data Warehouse:
 #' \itemize{
-#'   \item Data Warehouse: \url{https://www.maine.gov/doe/data-reporting/warehouse}
-#'   \item Enrollment Data: \url{https://www.maine.gov/doe/data-warehouse/reporting/enrollment}
+#'   \item Maine DOE Data Warehouse (2016-present): \url{https://www.maine.gov/doe/data-warehouse/reporting/enrollment}
 #' }
 #'
 #' @section Data Availability:
 #' \itemize{
-#'   \item Years: 2003-2025 (October 1 counts)
+#'   \item Years: 2016-present (Annual October 1 certified counts)
 #'   \item Aggregation levels: State, SAU (District), School
-#'   \item Demographics: Race/ethnicity (limited categories pre-2011)
+#'   \item Demographics: Race/ethnicity
 #'   \item Grade levels: PK through 12
 #' }
 #'
 #' @section Known Caveats:
 #' \itemize{
+#'   \item Data only available from 2016 forward (no historical data before 2016)
 #'   \item Maine is predominantly white; small n for some demographic groups
-#'   \item Pre-2011 data may combine Asian and Pacific Islander
 #'   \item Some rural schools have very small enrollments (suppression possible)
 #'   \item Maine has many SAUs with only 1-2 schools
 #' }
