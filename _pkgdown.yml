@@ -1,4 +1,7 @@
 url: https://almartin82.github.io/meschooldata/
+authors:
+  Andy Martin:
+    href: https://github.com/almartin82
 
 template:
   bootstrap: 5
