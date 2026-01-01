@@ -16,4 +16,12 @@ List with school and district data
 Downloads enrollment data from the Maine DOE Data Warehouse Excel files.
 The files contain multiple years of data (2016+).
 }
+\details{
+Maine DOE provides several enrollment files:
+\itemize{
+\item Public Funded Attending Counts by District
+\item Public Funded Responsible Counts by District
+\item Public Funded Residential Counts by Town and County
+}
+}
 \keyword{internal}
