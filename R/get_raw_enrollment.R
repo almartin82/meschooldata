@@ -220,42 +220,42 @@ parse_raw_data_sheet <- function(df, end_year) {
   }
 
   # Aggregate to school level (sum across grades)
-  school_data <- df %>%
+  school_data <- df |>
     dplyr::group_by(
       sau_id = if (!is.na(sau_id_col)) .data[[sau_id_col]] else NA,
       district_name = if (!is.na(sau_name_col)) .data[[sau_name_col]] else NA,
       campus_id = if (!is.na(school_id_col)) .data[[school_id_col]] else NA,
       campus_name = if (!is.na(school_name_col)) .data[[school_name_col]] else NA
-    ) %>%
+    ) |>
     dplyr::summarize(
       row_total = sum(.data[[count_col]], na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(
       end_year = end_year,
       type = "Campus",
       district_id = as.character(sau_id),
       campus_id = as.character(campus_id)
-    ) %>%
+    ) |>
     dplyr::select(-sau_id)
 
   # Also create grade-level columns by pivoting
   if (!is.na(grade_col)) {
-    grade_pivot <- df %>%
+    grade_pivot <- df |>
       dplyr::group_by(
         sau_id = if (!is.na(sau_id_col)) .data[[sau_id_col]] else NA,
         district_name = if (!is.na(sau_name_col)) .data[[sau_name_col]] else NA,
         campus_id_orig = if (!is.na(school_id_col)) .data[[school_id_col]] else NA,
         campus_name = if (!is.na(school_name_col)) .data[[school_name_col]] else NA,
         grade = .data[[grade_col]]
-      ) %>%
+      ) |>
       dplyr::summarize(
         count = sum(.data[[count_col]], na.rm = TRUE),
         .groups = "drop"
-      ) %>%
+      ) |>
       dplyr::mutate(
         grade_std = standardize_grade(grade)
-      ) %>%
+      ) |>
       tidyr::pivot_wider(
         id_cols = c(sau_id, district_name, campus_id_orig, campus_name),
         names_from = grade_std,
@@ -285,13 +285,13 @@ parse_raw_data_sheet <- function(df, end_year) {
   }
 
   # Create district aggregate
-  district_data <- school_data %>%
-    dplyr::group_by(district_id, district_name) %>%
+  district_data <- school_data |>
+    dplyr::group_by(district_id, district_name) |>
     dplyr::summarize(
       row_total = sum(row_total, na.rm = TRUE),
       dplyr::across(dplyr::starts_with("grade_"), ~sum(.x, na.rm = TRUE)),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(
       end_year = end_year,
       type = "District",
@@ -318,9 +318,9 @@ transform_state_level_data <- function(df, end_year) {
   year_col <- as.character(end_year)
 
   # State-level format: Grade column + year columns with enrollment counts
-  result <- df %>%
-    dplyr::select(Grade = 1, enrollment = dplyr::all_of(year_col)) %>%
-    dplyr::filter(!is.na(Grade), !grepl("Grand|Total", Grade, ignore.case = TRUE)) %>%
+  result <- df |>
+    dplyr::select(Grade = 1, enrollment = dplyr::all_of(year_col)) |>
+    dplyr::filter(!is.na(Grade), !grepl("Grand|Total", Grade, ignore.case = TRUE)) |>
     dplyr::mutate(
       enrollment = safe_numeric(enrollment)
     )
@@ -347,8 +347,8 @@ transform_state_level_data <- function(df, end_year) {
 
   for (from in names(grade_map)) {
     to <- grade_map[from]
-    grade_val <- result %>%
-      dplyr::filter(Grade == from) %>%
+    grade_val <- result |>
+      dplyr::filter(Grade == from) |>
       dplyr::pull(enrollment)
 
     state_row[[to]] <- if (length(grade_val) > 0) grade_val[1] else NA_integer_
