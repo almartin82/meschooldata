@@ -4,8 +4,8 @@
 **[Getting
 Started](https://almartin82.github.io/meschooldata/articles/quickstart.html)**
 
-Fetch and analyze Maine public school enrollment data from the Maine
-Department of Education (DOE) Data Warehouse.
+Fetch and analyze Maine school enrollment data from the Maine Department
+of Education (DOE) Data Warehouse in R or Python.
 
 ## What can you find with meschooldata?
 
@@ -234,6 +234,8 @@ remotes::install_github("almartin82/meschooldata")
 
 ## Quick start
 
+### R
+
 ``` r
 library(meschooldata)
 library(dplyr)
@@ -260,6 +262,40 @@ enr_2025 %>%
          grade_level == "TOTAL",
          subgroup %in% c("white", "black", "hispanic", "asian")) %>%
   select(district_name, subgroup, n_students, pct)
+```
+
+### Python
+
+``` python
+import pymeschooldata as me
+
+# Fetch one year
+enr_2025 = me.fetch_enr(2025)
+
+# Fetch multiple years
+enr_multi = me.fetch_enr_multi(range(2020, 2026))
+
+# State totals
+state_totals = enr_2025[
+    (enr_2025['is_state'] == True) &
+    (enr_2025['subgroup'] == 'total_enrollment') &
+    (enr_2025['grade_level'] == 'TOTAL')
+]
+
+# SAU breakdown
+sau_totals = enr_2025[
+    (enr_2025['is_district'] == True) &
+    (enr_2025['subgroup'] == 'total_enrollment') &
+    (enr_2025['grade_level'] == 'TOTAL')
+].sort_values('n_students', ascending=False).head(15)
+
+# Portland demographics
+portland = enr_2025[
+    (enr_2025['is_district'] == True) &
+    (enr_2025['district_name'].str.contains('Portland')) &
+    (enr_2025['grade_level'] == 'TOTAL') &
+    (enr_2025['subgroup'].isin(['white', 'black', 'hispanic', 'asian']))
+][['district_name', 'subgroup', 'n_students', 'pct']]
 ```
 
 ## Data availability
@@ -294,17 +330,12 @@ Data is sourced from the Maine Department of Education Data Warehouse:
 - Some rural schools have very small enrollments that may be suppressed
 - File URLs may change when Maine DOE updates their data files
 
-## Part of the 50 State Schooldata Family
+## Part of the State Schooldata Project
 
-This package is part of a family of R packages providing school
-enrollment data for all 50 US states. Each package fetches data directly
-from the state’s Department of Education.
+A simple, consistent interface for accessing state-published school data
+in Python and R.
 
-**See also:**
-[njschooldata](https://github.com/almartin82/njschooldata) - The
-original state schooldata package for New Jersey.
-
-**All packages:**
+**All 50 state packages:**
 [github.com/almartin82](https://github.com/almartin82?tab=repositories&q=schooldata)
 
 ## Author
