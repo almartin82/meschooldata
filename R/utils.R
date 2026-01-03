@@ -52,7 +52,7 @@ standardize_grade <- function(grade) {
 #' Get available years for Maine enrollment data
 #'
 #' Returns the range of years for which enrollment data is available.
-#' Maine DOE Data Warehouse has data from 2016 to present.
+#' Maine DOE Data Warehouse has data from 2016 to 2024.
 #'
 #' Data is sourced exclusively from the Maine Department of Education (DOE)
 #' Data Warehouse, which provides Annual October 1 certified enrollment data.
@@ -66,18 +66,15 @@ get_available_years <- function() {
   # (metadata shows "SchoolYearCode > 2015")
   # Data source: https://www.maine.gov/doe/data-warehouse/reporting/enrollment
 
-  current_year <- as.integer(format(Sys.Date(), "%Y"))
-
-  # If we're past October, current school year data may be available
-  current_month <- as.integer(format(Sys.Date(), "%m"))
-  max_year <- if (current_month >= 10) current_year + 1 else current_year
+  # Max year capped at 2024 for confirmed data availability
+  max_year <- 2024L
 
   list(
     min_year = 2016L,
     max_year = max_year,
     source = "Maine DOE Data Warehouse",
     url = "https://www.maine.gov/doe/data-warehouse/reporting/enrollment",
-    note = "Data available from 2016 to present. Based on Annual October 1 certified data sets."
+    note = "Data available from 2016 to 2024. Based on Annual October 1 certified data sets."
   )
 }
 
