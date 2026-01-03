@@ -10,12 +10,62 @@
 #
 # Data Source: https://www.maine.gov/doe/data-warehouse/reporting/enrollment
 #
+# STATUS: As of January 2026, the primary enrollment data files are NOT available
+# via direct download. Maine DOE has migrated to QuickSight/Tableau dashboards.
+# The package provides import_local_enrollment() for manually downloaded data.
+#
 # ==============================================================================
+
+#' Get download instructions for Maine enrollment data
+#'
+#' Since Maine DOE enrollment data is not available for automated download,
+#' this function provides instructions for manually downloading data from
+#' the QuickSight dashboard.
+#'
+#' @return Invisibly returns the Maine DOE data URL
+#' @export
+#' @examples
+#' get_download_instructions()
+get_download_instructions <- function() {
+  url <- "https://www.maine.gov/doe/data-warehouse/reporting/enrollment"
+
+  message("============================================================")
+  message("Maine DOE Enrollment Data - Manual Download Required")
+  message("============================================================")
+
+  message("")
+  message("Maine DOE has migrated enrollment data to interactive dashboards.")
+  message("Direct Excel file downloads are no longer available.")
+  message("")
+  message("To obtain enrollment data:")
+  message("")
+  message("1. Visit the Maine DOE enrollment page:")
+  message("   ", url)
+  message("")
+  message("2. Access the QuickFacts dashboard:")
+  message("   https://p20w.slds.maine.gov/QuickFacts")
+  message("")
+  message("3. Export data from the dashboard (if available) or")
+  message("   contact Maine DOE for custom data requests:")
+  message("   medms.helpdesk@maine.gov")
+  message("")
+  message("4. Once you have a downloaded file, use:")
+  message("   import_local_enrollment('path/to/your/file.xlsx')")
+  message("")
+  message("============================================================")
+
+  invisible(url)
+}
+
 
 #' Download raw enrollment data from Maine DOE
 #'
 #' Downloads enrollment data from Maine DOE's Data Warehouse.
 #' Data is available from 2016 to present.
+#'
+#' NOTE: As of January 2026, direct download is not available. Maine DOE
+#' has migrated to QuickSight dashboards. Use import_local_enrollment()
+#' with manually downloaded data instead.
 #'
 #' @param end_year School year end (2023-24 = 2024)
 #' @return List with school and district data frames
@@ -93,8 +143,12 @@ download_maine_doe <- function(end_year) {
   if (!download_success) {
     unlink(temp_file)
     stop(paste0(
-      "Failed to download Maine DOE enrollment data.\n",
-      "Please check your internet connection and try again.\n",
+      "Maine DOE enrollment data is not available for automated download.\n",
+      "Maine DOE has migrated to QuickSight dashboards.\n\n",
+      "To obtain data:\n",
+      "1. Run get_download_instructions() for guidance\n",
+      "2. Download data manually from the dashboard\n",
+      "3. Use import_local_enrollment('path/to/file.xlsx')\n\n",
       "Data source: https://www.maine.gov/doe/data-warehouse/reporting/enrollment"
     ))
   }
@@ -399,4 +453,303 @@ create_empty_enrollment_df <- function(end_year, type) {
     grade_12 = integer(),
     stringsAsFactors = FALSE
   )
+}
+
+
+# ==============================================================================
+# Local File Import Functions
+# ==============================================================================
+
+#' Import enrollment data from a local file
+#'
+#' Reads enrollment data from a locally downloaded Excel or CSV file.
+#' Use this function when automatic download is not available (e.g., when
+#' Maine DOE has moved data to a dashboard).
+#'
+#' @param file_path Path to the local Excel (.xlsx) or CSV file
+#' @param end_year School year end (e.g., 2024 for 2023-24). If not provided,
+#'   the function will attempt to detect it from the file.
+#' @param tidy If TRUE (default), returns data in long (tidy) format.
+#' @return Data frame with enrollment data
+#' @export
+#' @examples
+#' \dontrun{
+#' # Import from manually downloaded Excel file
+#' enr <- import_local_enrollment("~/Downloads/maine_enrollment.xlsx", end_year = 2024)
+#'
+#' # Import from CSV export
+#' enr <- import_local_enrollment("~/Downloads/quicksight_export.csv", end_year = 2024)
+#' }
+import_local_enrollment <- function(file_path, end_year = NULL, tidy = TRUE) {
+
+  # Check file exists
+
+  if (!file.exists(file_path)) {
+    stop("File not found: ", file_path)
+  }
+
+  # Determine file type
+  ext <- tolower(tools::file_ext(file_path))
+
+  if (!ext %in% c("xlsx", "xls", "csv")) {
+    stop("Unsupported file type: .", ext, "\n",
+         "Please provide an Excel (.xlsx, .xls) or CSV (.csv) file.")
+  }
+
+  # Read file based on type
+  if (ext %in% c("xlsx", "xls")) {
+    raw_df <- read_local_excel(file_path, end_year)
+  } else {
+    raw_df <- read_local_csv(file_path, end_year)
+  }
+
+  # Detect year if not provided
+  if (is.null(end_year)) {
+    end_year <- detect_year_from_data(raw_df)
+    if (is.null(end_year)) {
+      stop("Could not detect year from data. Please provide end_year parameter.")
+    }
+    message("Detected year: ", end_year)
+  }
+
+  # Process to standard schema
+  processed <- process_local_data(raw_df, end_year)
+
+  # Create state aggregate
+  state_row <- create_state_from_districts(processed, end_year)
+  processed <- dplyr::bind_rows(state_row, processed)
+
+  # Optionally tidy
+  if (tidy) {
+    processed <- tidy_enr(processed) |>
+      id_enr_aggs()
+  }
+
+  processed
+}
+
+
+#' Read local Excel file
+#'
+#' @param file_path Path to Excel file
+#' @param end_year School year end
+#' @return Data frame
+#' @keywords internal
+read_local_excel <- function(file_path, end_year) {
+  sheets <- readxl::excel_sheets(file_path)
+
+  # Try to find data sheet
+  data_sheet <- NULL
+  for (sheet_name in c("Data Report", "Raw Data", "Data", sheets[length(sheets)])) {
+    if (sheet_name %in% sheets) {
+      data_sheet <- sheet_name
+      break
+    }
+  }
+
+  if (is.null(data_sheet)) {
+    data_sheet <- sheets[1]
+  }
+
+  # Read with some flexibility for header rows
+  df <- readxl::read_excel(file_path, sheet = data_sheet)
+
+  # Check if first row looks like headers (non-numeric)
+  if (nrow(df) > 0 && all(is.na(as.numeric(df[1, ])))) {
+    # Skip potential header row
+  }
+
+  df
+}
+
+
+#' Read local CSV file
+#'
+#' @param file_path Path to CSV file
+#' @param end_year School year end
+#' @return Data frame
+#' @keywords internal
+read_local_csv <- function(file_path, end_year) {
+  readr::read_csv(file_path, show_col_types = FALSE)
+}
+
+
+#' Detect year from data
+#'
+#' @param df Data frame
+#' @return Integer year or NULL
+#' @keywords internal
+detect_year_from_data <- function(df) {
+  cols <- names(df)
+
+  # Look for School Year column
+  year_col <- grep("School.?Year|Year", cols, value = TRUE, ignore.case = TRUE)
+
+  if (length(year_col) > 0) {
+    year_vals <- unique(df[[year_col[1]]])
+    year_vals <- year_vals[!is.na(year_vals)]
+
+    # Parse year from "2023-24" format or numeric
+    for (val in year_vals) {
+      if (is.numeric(val) && val >= 2016 && val <= 2030) {
+        return(as.integer(val))
+      }
+      if (is.character(val)) {
+        # Try "2023-24" format
+        match <- regmatches(val, regexpr("20\\d{2}", val))
+        if (length(match) > 0) {
+          year <- as.integer(match[1])
+          # If format is "2023-24", the end year is 2024
+          if (grepl("-\\d{2}$", val)) {
+            year <- year + 1L
+          }
+          return(year)
+        }
+      }
+    }
+  }
+
+  NULL
+}
+
+
+#' Process local data to standard schema
+#'
+#' @param df Raw data frame
+#' @param end_year School year end
+#' @return Processed data frame
+#' @keywords internal
+process_local_data <- function(df, end_year) {
+  cols <- names(df)
+  n_rows <- nrow(df)
+
+  # Helper to find column by pattern (case-insensitive)
+  find_col <- function(patterns) {
+    for (pattern in patterns) {
+      matched <- grep(pattern, cols, value = TRUE, ignore.case = TRUE)
+      if (length(matched) > 0) return(matched[1])
+    }
+    NULL
+  }
+
+  # Build result dataframe
+  result <- data.frame(
+    end_year = rep(end_year, n_rows),
+    type = rep("District", n_rows),  # Assume district level by default
+    stringsAsFactors = FALSE
+  )
+
+  # District ID
+  district_id_col <- find_col(c("SAU.?ID", "District.?ID", "LEA.?ID"))
+  if (!is.null(district_id_col)) {
+    result$district_id <- trimws(as.character(df[[district_id_col]]))
+  } else {
+    result$district_id <- paste0("ME", sprintf("%03d", seq_len(n_rows)))
+  }
+
+  # Campus ID (NA for district data)
+  result$campus_id <- NA_character_
+
+  # District name
+  district_name_col <- find_col(c("SAU.?Name", "District.?Name", "Name"))
+  if (!is.null(district_name_col)) {
+    result$district_name <- clean_names(as.character(df[[district_name_col]]))
+  } else {
+    result$district_name <- NA_character_
+  }
+
+  result$campus_name <- NA_character_
+  result$county <- NA_character_
+
+  # Total enrollment
+  total_col <- find_col(c("^Total$", "Enrollment", "Students", "Count"))
+  if (!is.null(total_col)) {
+    result$row_total <- safe_numeric(df[[total_col]])
+  } else {
+    result$row_total <- NA_integer_
+  }
+
+  # Demographics
+  demo_map <- list(
+    white = c("White"),
+    black = c("Black", "African"),
+    hispanic = c("Hispanic", "Latino"),
+    asian = c("Asian"),
+    pacific_islander = c("Pacific", "Hawaiian"),
+    native_american = c("American Indian", "Native", "Indian"),
+    multiracial = c("Two or More", "Multi", "Two")
+  )
+
+  for (name in names(demo_map)) {
+    col <- find_col(demo_map[[name]])
+    if (!is.null(col)) {
+      result[[name]] <- safe_numeric(df[[col]])
+    } else {
+      result[[name]] <- NA_integer_
+    }
+  }
+
+  # Gender
+  male_col <- find_col(c("^Male$", "^M$"))
+  if (!is.null(male_col)) {
+    result$male <- safe_numeric(df[[male_col]])
+  } else {
+    result$male <- NA_integer_
+  }
+
+  female_col <- find_col(c("^Female$", "^F$"))
+  if (!is.null(female_col)) {
+    result$female <- safe_numeric(df[[female_col]])
+  } else {
+    result$female <- NA_integer_
+  }
+
+  # Filter out rows with zero or NA total
+  result <- result[!is.na(result$row_total) & result$row_total > 0, ]
+
+  result
+}
+
+
+#' Create state row from district data
+#'
+#' @param df Processed district data
+#' @param end_year School year end
+#' @return Single-row data frame with state totals
+#' @keywords internal
+create_state_from_districts <- function(df, end_year) {
+
+  if (nrow(df) == 0) {
+    return(create_empty_enrollment_df(end_year, "State"))
+  }
+
+  # Columns to sum
+  sum_cols <- c(
+    "row_total",
+    "white", "black", "hispanic", "asian",
+    "pacific_islander", "native_american", "multiracial",
+    "male", "female"
+  )
+  sum_cols <- sum_cols[sum_cols %in% names(df)]
+
+  # Create state row
+  state_row <- data.frame(
+    end_year = end_year,
+    type = "State",
+    district_id = NA_character_,
+    campus_id = NA_character_,
+    district_name = NA_character_,
+    campus_name = NA_character_,
+    county = NA_character_,
+    stringsAsFactors = FALSE
+  )
+
+  # Sum each column
+  for (col in sum_cols) {
+    if (col %in% names(df)) {
+      state_row[[col]] <- sum(df[[col]], na.rm = TRUE)
+    }
+  }
+
+  state_row
 }

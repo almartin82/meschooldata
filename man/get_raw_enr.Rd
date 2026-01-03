@@ -16,4 +16,9 @@ List with school and district data frames
 Downloads enrollment data from Maine DOE's Data Warehouse.
 Data is available from 2016 to present.
 }
+\details{
+NOTE: As of January 2026, direct download is not available. Maine DOE
+has migrated to QuickSight dashboards. Use import_local_enrollment()
+with manually downloaded data instead.
+}
 \keyword{internal}
