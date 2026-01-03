@@ -27,7 +27,7 @@ get_available_years()
 #> [1] 2016
 #> 
 #> $max_year
-#> [1] 2026
+#> [1] 2024
 #> 
 #> $source
 #> [1] "Maine DOE Data Warehouse"
@@ -36,6 +36,6 @@ get_available_years()
 #> [1] "https://www.maine.gov/doe/data-warehouse/reporting/enrollment"
 #> 
 #> $note
-#> [1] "Data available from 2016 to present. Based on Annual October 1 certified data sets."
+#> [1] "Data available from 2016 to 2024. Based on Annual October 1 certified data sets."
 #> 
 ```
