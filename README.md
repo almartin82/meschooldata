@@ -35,8 +35,6 @@ enr_2025 %>%
   arrange(desc(pct))
 ```
 
-![Demographics](man/figures/demographics.png)
-
 ---
 
 ### 2. Portland is diversifying rapidly
@@ -54,8 +52,6 @@ enr %>%
   mutate(pct = round(pct * 100, 1)) %>%
   select(end_year, subgroup, pct)
 ```
-
-![Portland diversity](man/figures/portland-diversity.png)
 
 ---
 
@@ -78,8 +74,6 @@ enr %>%
   head(10)
 ```
 
-![Rural decline](man/figures/rural-decline.png)
-
 ---
 
 ### 4. Lewiston: Somali refugees transform a mill town
@@ -94,8 +88,6 @@ enr %>%
   select(end_year, n_students, pct)
 ```
 
-![Lewiston transformation](man/figures/lewiston-refugees.png)
-
 ---
 
 ### 5. COVID's kindergarten dip
@@ -108,8 +100,6 @@ enr %>%
          grade_level %in% c("K", "01", "06", "12")) %>%
   select(end_year, grade_level, n_students)
 ```
-
-![COVID kindergarten](man/figures/covid-k.png)
 
 ---
 
@@ -125,8 +115,6 @@ enr %>%
   group_by(end_year) %>%
   summarize(southern = sum(n_students, na.rm = TRUE))
 ```
-
-![Southern growth](man/figures/southern-growth.png)
 
 ---
 
@@ -148,8 +136,6 @@ enr_2025 %>%
   summarize(n_districts = n())
 ```
 
-![District sizes](man/figures/district-sizes.png)
-
 ---
 
 ### 8. Bangor is stable in a declining region
@@ -162,8 +148,6 @@ enr %>%
          subgroup == "total_enrollment", grade_level == "TOTAL") %>%
   select(end_year, district_name, n_students)
 ```
-
-![Bangor stability](man/figures/bangor-stable.png)
 
 ---
 
@@ -179,8 +163,6 @@ enr_2025 %>%
   head(10)
 ```
 
-![EL concentration](man/figures/el-concentration.png)
-
 ---
 
 ### 10. The graying of Maine shows in the schools
@@ -193,8 +175,6 @@ enr %>%
   select(end_year, n_students) %>%
   mutate(change = n_students - lag(n_students))
 ```
-
-![Statewide enrollment](man/figures/statewide-trend.png)
 
 ---
 
