@@ -52,8 +52,8 @@ if (is.list(years)) {
   min_year <- min(years)
 }
 
-# Fetch data
-enr <- fetch_enr_multi((max_year - 9):max_year)
+# Fetch data - use available years (don't go below min_year)
+enr <- fetch_enr_multi(max(min_year, max_year - 9):max_year)
 enr_current <- fetch_enr(max_year)
 ```
 
