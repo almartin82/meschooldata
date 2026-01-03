@@ -33,6 +33,10 @@ enr_2025 %>%
   arrange(desc(pct))
 ```
 
+![Demographics](reference/figures/demographics.png)
+
+Demographics
+
 ------------------------------------------------------------------------
 
 ### 2. Portland is diversifying rapidly
@@ -51,6 +55,10 @@ enr %>%
   mutate(pct = round(pct * 100, 1)) %>%
   select(end_year, subgroup, pct)
 ```
+
+![Portland diversity](reference/figures/portland-diversity.png)
+
+Portland diversity
 
 ------------------------------------------------------------------------
 
@@ -74,6 +82,10 @@ enr %>%
   head(10)
 ```
 
+![Rural decline](reference/figures/rural-decline.png)
+
+Rural decline
+
 ------------------------------------------------------------------------
 
 ### 4. Lewiston: Somali refugees transform a mill town
@@ -89,6 +101,10 @@ enr %>%
   select(end_year, n_students, pct)
 ```
 
+![Lewiston transformation](reference/figures/lewiston-refugees.png)
+
+Lewiston transformation
+
 ------------------------------------------------------------------------
 
 ### 5. COVID’s kindergarten dip
@@ -102,6 +118,10 @@ enr %>%
          grade_level %in% c("K", "01", "06", "12")) %>%
   select(end_year, grade_level, n_students)
 ```
+
+![COVID kindergarten](reference/figures/covid-k.png)
+
+COVID kindergarten
 
 ------------------------------------------------------------------------
 
@@ -118,6 +138,10 @@ enr %>%
   group_by(end_year) %>%
   summarize(southern = sum(n_students, na.rm = TRUE))
 ```
+
+![Southern growth](reference/figures/southern-growth.png)
+
+Southern growth
 
 ------------------------------------------------------------------------
 
@@ -140,6 +164,10 @@ enr_2025 %>%
   summarize(n_districts = n())
 ```
 
+![District sizes](reference/figures/district-sizes.png)
+
+District sizes
+
 ------------------------------------------------------------------------
 
 ### 8. Bangor is stable in a declining region
@@ -153,6 +181,10 @@ enr %>%
          subgroup == "total_enrollment", grade_level == "TOTAL") %>%
   select(end_year, district_name, n_students)
 ```
+
+![Bangor stability](reference/figures/bangor-stable.png)
+
+Bangor stability
 
 ------------------------------------------------------------------------
 
@@ -169,6 +201,10 @@ enr_2025 %>%
   head(10)
 ```
 
+![EL concentration](reference/figures/el-concentration.png)
+
+EL concentration
+
 ------------------------------------------------------------------------
 
 ### 10. The graying of Maine shows in the schools
@@ -182,6 +218,10 @@ enr %>%
   select(end_year, n_students) %>%
   mutate(change = n_students - lag(n_students))
 ```
+
+![Statewide enrollment](reference/figures/statewide-trend.png)
+
+Statewide enrollment
 
 ------------------------------------------------------------------------
 
