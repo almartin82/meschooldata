@@ -11,7 +11,7 @@ Named list with min_year, max_year, source info, and available years
 }
 \description{
 Returns the range of years for which enrollment data is available.
-Maine DOE Data Warehouse has data from 2016 to present.
+Maine DOE Data Warehouse has data from 2016 to 2024.
 }
 \details{
 Data is sourced exclusively from the Maine Department of Education (DOE)

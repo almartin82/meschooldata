@@ -71,6 +71,7 @@ Data is sourced exclusively from the Maine DOE Data Warehouse:
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://almartin82.github.io/meschooldata}
   \item \url{https://github.com/almartin82/meschooldata}
   \item Report bugs at \url{https://github.com/almartin82/meschooldata/issues}
 }
