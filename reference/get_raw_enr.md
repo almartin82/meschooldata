@@ -18,3 +18,9 @@ get_raw_enr(end_year)
 ## Value
 
 List with school and district data frames
+
+## Details
+
+NOTE: As of January 2026, direct download is not available. Maine DOE
+has migrated to QuickSight dashboards. Use import_local_enrollment()
+with manually downloaded data instead.

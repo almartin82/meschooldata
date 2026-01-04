@@ -11,156 +11,229 @@ federal data.
 
 ------------------------------------------------------------------------
 
-## Current Status: DATA SOURCE BROKEN (as of 2026-01-03)
+## Current Status: DATA SOURCE UNAVAILABLE (as of January 2026)
 
-The primary enrollment data files are NO LONGER AVAILABLE via direct
-download. Maine DOE has migrated to interactive QuickSight dashboards.
+The primary enrollment data files are **NOT AVAILABLE** via direct
+download. Maine DOE has migrated to interactive QuickSight dashboards
+with no programmatic access.
 
-### What Was Investigated:
+### Data Source Investigation Summary
 
-1.  **Main enrollment page**:
-    <https://www.maine.gov/doe/data-warehouse/reporting/enrollment>
-    - Only 3 files available (none are primary enrollment data):
-      - `DATA - 60 Percent Enrollment by Fiscal Responsibility - 5.07.2025.xlsx`
-        (fiscal responsibility breakdown, not main enrollment)
-      - `DATA - Home Instruction Counts by District and Year 2025 - 8.7.2025.xlsx`
-        (homeschool only)
-      - `DATA - Home Instruction Counts by Age and Year 2025 - 8.7.2025.xlsx`
-        (homeschool only)
-2.  **Data Warehouse page**:
-    <https://www.maine.gov/doe/data-reporting/warehouse>
-    - Contains behavioral, absenteeism, special ed files — NO enrollment
-      files
-3.  **QuickFacts**:
-    <https://www.maine.gov/doe/data-reporting/reporting/warehouse/quickfacts>
-    - Embedded QuickSight dashboard at:
-      `https://p20w.slds.maine.gov/QuickFacts`
-    - No direct file download capability
-4.  **Historical URLs return 404**:
-    - `Public Funded Enrollments by Responsible District 2021.xlsx` -
-      404
-    - `DATA - Enrollment Counts by Responsible SAU` - 404
-    - `DATA - Public Funded Responsible Counts by District` - 404
+**Date of Investigation:** 2026-01-03
 
-### Available QuickSight Dashboards (NO API ACCESS):
+#### Pages Checked
 
-- QuickFacts: `https://p20w.slds.maine.gov/QuickFacts`
-- Enrollment by Student Demographic:
-  `https://p20w.slds.maine.gov/PublicFundedAttendingByStudentDemographicGroup`
+| URL                                                             | Status   | Content                                           |
+|-----------------------------------------------------------------|----------|---------------------------------------------------|
+| <https://www.maine.gov/doe/data-warehouse/reporting/enrollment> | HTTP 200 | Enrollment page - only 3 files available          |
+| <https://www.maine.gov/doe/data-reporting/warehouse>            | HTTP 200 | Data Warehouse - behavioral/absenteeism data only |
+| <https://p20w.slds.maine.gov/QuickFacts>                        | HTTP 200 | QuickSight dashboard - NO API, NO export          |
+| <https://neo.maine.gov/DOE/NEO/Dashboard>                       | HTTP 200 | NEO Dashboard - requires login                    |
+| <https://www.maine.gov/doe/dashboard>                           | HTTP 200 | ESSA Dashboard - Tableau, export PDFs only        |
 
-These dashboards use Amazon QuickSight embedded views. They do NOT
-provide: - Direct download links - API endpoints - Programmatic access
+#### Available Files (HTTP 200)
 
-### Verified Working File Downloads:
+| File                                    | URL                                                                                                             | Purpose                                                                  |
+|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| 60% Enrollment by Fiscal Responsibility | `/doe/sites/.../DATA%20-%2060%20Percent%20Enrollment%20by%20Fiscal%20Responsibility%20-%205.07.2025.xlsx`       | Fiscal breakdown for private schools (40 rows) - **NOT main enrollment** |
+| Home Instruction by District            | `/doe/sites/.../DATA%20-%20Home%20Instruction%20Counts%20by%20District%20and%20Year%202025%20-%208.7.2025.xlsx` | Homeschool counts only                                                   |
+| Home Instruction by Age                 | `/doe/sites/.../DATA%20-%20Home%20Instruction%20Counts%20by%20Age%20and%20Year%202025%20-%208.7.2025.xlsx`      | Homeschool by age                                                        |
+| Chronic Absenteeism Report              | `/doe/sites/.../DATA%20-%20Chronic%20Absenteeism%20Report%202024%20-%206.20.2025.xlsx`                          | Absenteeism RATES only (no counts)                                       |
 
-    URL: https://www.maine.gov/doe/sites/maine.gov.doe/files/inline-files/DATA%20-%2060%20Percent%20Enrollment%20by%20Fiscal%20Responsibility%20-%205.07.2025.xlsx
-    Status: HTTP 200 ✓
-    Content: Excel file with fiscal responsibility breakdown (NOT main enrollment)
+#### Missing Files (HTTP 404)
 
-------------------------------------------------------------------------
+| Expected File                                                         | Status        |
+|-----------------------------------------------------------------------|---------------|
+| `DATA - Enrollment Counts by Responsible SAU - 10.29.2025.xlsx`       | 404 - REMOVED |
+| `DATA - Public Funded Responsible Counts by District - 6.4.2025.xlsx` | 404 - REMOVED |
+| `Public Funded Enrollments by Responsible District 2024.xlsx`         | 404 - REMOVED |
+| All other enrollment-by-district patterns                             | 404 - REMOVED |
 
-## Required Actions to Fix
+#### Dashboards (No Programmatic Access)
 
-1.  **Contact Maine DOE** to request:
-    - Direct Excel/CSV downloads of enrollment data
-    - API access to QuickSight dashboards
-    - Historical data files
-2.  **Alternative approaches** (in order of preference):
-    - Find archived Excel files from Maine DOE
-    - Use browser automation (Selenium/RSelenium) to export from
-      dashboard
-    - Request custom data extract from Maine DOE (they offer this
-      service)
-    - As LAST RESORT: manual download instructions for users
-3.  **Do NOT use**:
-    - Urban Institute Education Data Portal
-    - NCES CCD data
-    - Any federal data aggregation
+| Dashboard      | URL                                       | Access                                         |
+|----------------|-------------------------------------------|------------------------------------------------|
+| QuickFacts     | <https://p20w.slds.maine.gov/QuickFacts>  | QuickSight - NO API, print disabled, no export |
+| ESSA Dashboard | <https://www.maine.gov/doe/dashboard>     | Tableau - PDF export only                      |
+| NEO Dashboard  | <https://neo.maine.gov/DOE/NEO/Dashboard> | Requires login                                 |
 
 ------------------------------------------------------------------------
 
-## Available Years (when working)
+## Package Functions
 
-2016-2024 (October 1 certified enrollment data)
+### For Users
 
-------------------------------------------------------------------------
+| Function                                                                                                          | Purpose                                           |
+|-------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| [`get_download_instructions()`](https://almartin82.github.io/meschooldata/reference/get_download_instructions.md) | Displays instructions for manually obtaining data |
+| `import_local_enrollment(file_path, end_year)`                                                                    | Import from locally downloaded Excel/CSV file     |
+| [`get_available_years()`](https://almartin82.github.io/meschooldata/reference/get_available_years.md)             | Returns available year range (2016-2024)          |
+| [`cache_status()`](https://almartin82.github.io/meschooldata/reference/cache_status.md)                           | Show cached data files                            |
+| [`clear_cache()`](https://almartin82.github.io/meschooldata/reference/clear_cache.md)                             | Clear cached data                                 |
 
-## Data Pipeline Testing Framework
-
-### LIVE Test Categories (in order of execution):
-
-1.  **URL Availability Test**
-    - HTTP HEAD request to each data URL
-    - Expected: HTTP 200
-    - Test file: `tests/testthat/test-pipeline-live.R`
-2.  **File Download Test**
-    - Full GET request with write_disk
-    - Verify file size \> minimum threshold
-    - Verify file type (Excel, not HTML error page)
-3.  **File Parsing Test**
-    - readxl::excel_sheets() succeeds
-    - readxl::read_excel() returns data frame
-    - Data frame has rows and columns
-4.  **Column Structure Test**
-    - Expected sheets exist (Metadata, Data Report, etc.)
-    - Expected columns exist (year, district, school, enrollment, etc.)
-5.  **Year Filtering Test**
-    - Can extract single year from multi-year file
-    - Extracted data has correct year
-6.  **Aggregation Test**
-    - Sum of districts = state total
-    - Sum of schools = district totals
-    - Tolerance: within 1%
-7.  **Data Quality Test**
-    - No Inf values
-    - No NaN values
-    - No negative enrollment counts
-    - Percentages in range \[0, 1\]
-8.  **Output Fidelity Test**
-    - tidy=TRUE output matches raw data totals
-    - Grade sums equal row totals
-    - Demographic sums equal row totals
-
-### Running Live Tests
+### Usage When Data Source is Fixed
 
 ``` r
-devtools::test(filter = "pipeline-live")
+# When direct download works:
+enr <- fetch_enr(2024)
+enr_multi <- fetch_enr_multi(2022:2024)
+```
+
+### Usage With Local Files
+
+``` r
+# 1. Get instructions
+get_download_instructions()
+
+# 2. Download file manually from dashboard
+
+# 3. Import local file
+enr <- import_local_enrollment("~/Downloads/maine_enrollment.xlsx", end_year = 2024)
 ```
 
 ------------------------------------------------------------------------
 
-## Git Commits and PRs
+## Required Actions to Fix Data Source
 
-- NEVER reference Claude, Claude Code, or AI assistance in commit
-  messages
-- NEVER reference Claude, Claude Code, or AI assistance in PR
-  descriptions
-- NEVER add Co-Authored-By lines mentioning Claude or Anthropic
-- Keep commit messages focused on what changed, not how it was written
+### Option 1: Contact Maine DOE (Recommended)
+
+1.  Email: <medms.helpdesk@maine.gov>
+2.  Request: Direct Excel/CSV downloads of enrollment data
+3.  Alternative: Request API access to QuickSight dashboards
+
+### Option 2: Browser Automation (Complex)
+
+1.  Use RSelenium to automate dashboard interaction
+2.  Export data from QuickSight dashboard
+3.  Parse exported data
+
+### Option 3: Wait for Restoration
+
+- Maine DOE may restore Excel downloads
+- Monitor:
+  <https://www.maine.gov/doe/data-warehouse/reporting/enrollment>
+
+### DO NOT USE
+
+- Urban Institute Education Data Portal
+- NCES CCD data
+- Any federal data aggregation
 
 ------------------------------------------------------------------------
 
 ## LIVE Pipeline Testing
 
-This package includes `tests/testthat/test-pipeline-live.R` with LIVE
-network tests.
+The package includes comprehensive LIVE tests in
+`tests/testthat/test-pipeline-live.R`:
 
-### Test Categories:
+### Test Categories
 
-1.  URL Availability - HTTP 200 checks
-2.  File Download - Verify actual file (not HTML error)
-3.  File Parsing - readxl/readr succeeds
-4.  Column Structure - Expected columns exist
-5.  get_raw_enr() - Raw data function works
-6.  Data Quality - No Inf/NaN, non-negative counts
-7.  Aggregation - State total \> 0
-8.  Output Fidelity - tidy=TRUE matches raw
+1.  **URL Availability Tests** - Verify pages return HTTP 200
+2.  **File Download Tests** - Download files, verify size and type
+3.  **File Parsing Tests** - Read with readxl, verify structure
+4.  **Column Structure Tests** - Check for expected sheets/columns
+5.  **Package Function Tests** - Verify functions work correctly
+6.  **Cache Function Tests** - Test cache operations
+7.  **import_local_enrollment Tests** - Test local file import
+8.  **Data Quality Tests** (skipped until data available) - No Inf/NaN
+9.  **Aggregation Tests** (skipped until data available) - Totals sum
+    correctly
+10. **Output Fidelity Tests** (skipped until data available) - tidy
+    matches raw
 
-### Running Tests:
+### Running Tests
 
 ``` r
+# All tests
+devtools::test()
+
+# Pipeline tests only
 devtools::test(filter = "pipeline-live")
 ```
 
-See `state-schooldata/CLAUDE.md` for complete testing framework
-documentation.
+------------------------------------------------------------------------
+
+## Available Years
+
+**When working:** 2016-2024 (October 1 certified enrollment data)
+
+------------------------------------------------------------------------
+
+## Local Testing Before PRs (REQUIRED)
+
+**PRs will not be merged until CI passes.** Run these checks locally
+BEFORE opening a PR:
+
+``` r
+# R package check (required)
+devtools::check()
+
+# Python tests (required)
+system("pytest tests/test_pymeschooldata.py -v")
+
+# pkgdown build (required)
+pkgdown::build_site()
+```
+
+### Pre-PR Checklist
+
+`devtools::check()` — 0 errors, 0 warnings
+
+`devtools::test()` — all tests pass (skips allowed)
+
+[`pkgdown::build_site()`](https://pkgdown.r-lib.org/reference/build_site.html)
+— builds without errors
+
+------------------------------------------------------------------------
+
+## Test Results Summary
+
+**As of 2026-01-03:** - 69 tests passing - 0 tests failing - 6 tests
+skipped (waiting for data source)
+
+------------------------------------------------------------------------
+
+## Git Workflow (REQUIRED)
+
+### Feature Branch + PR + Auto-Merge Policy
+
+**NEVER push directly to main.** All changes must go through PRs with
+auto-merge:
+
+``` bash
+# 1. Create feature branch
+git checkout -b fix/description-of-change
+
+# 2. Make changes, commit
+git add -A
+git commit -m "Fix: description of change"
+
+# 3. Push and create PR with auto-merge
+git push -u origin fix/description-of-change
+gh pr create --title "Fix: description" --body "Description of changes"
+gh pr merge --auto --squash
+
+# 4. Clean up stale branches after PR merges
+git checkout main && git pull && git fetch --prune origin
+```
+
+### Branch Cleanup (REQUIRED)
+
+**Clean up stale branches every time you touch this package:**
+
+``` bash
+# Delete local branches merged to main
+git branch --merged main | grep -v main | xargs -r git branch -d
+
+# Prune remote tracking branches
+git fetch --prune origin
+```
+
+### Auto-Merge Requirements
+
+PRs auto-merge when ALL CI checks pass: - R-CMD-check (0 errors, 0
+warnings) - Python tests (if py{st}schooldata exists) - pkgdown build
+(vignettes must render)
+
+If CI fails, fix the issue and push - auto-merge triggers when checks
+pass.

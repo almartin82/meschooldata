@@ -1,7 +1,7 @@
 # Get available years for Maine enrollment data
 
 Returns the range of years for which enrollment data is available. Maine
-DOE Data Warehouse has data from 2016 to present.
+DOE Data Warehouse has data from 2016 to 2024.
 
 ## Usage
 
