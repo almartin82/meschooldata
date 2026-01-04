@@ -41,7 +41,7 @@ colors <- c("total" = "#2C3E50", "white" = "#3498DB", "black" = "#E74C3C",
             "hispanic" = "#F39C12", "asian" = "#9B59B6")
 ```
 
-```{r fetch-data, cache = TRUE}
+```{r fetch-data, cache = TRUE, error = TRUE}
 # Get available years
 years <- get_available_years()
 if (is.list(years)) {
@@ -52,9 +52,23 @@ if (is.list(years)) {
   min_year <- min(years)
 }
 
-# Fetch data - use available years (don't go below min_year)
-enr <- fetch_enr_multi(max(min_year, max_year - 9):max_year)
-enr_current <- fetch_enr(max_year)
+# Attempt to fetch data - may fail if data source is unavailable
+# (Maine DOE has moved to QuickSight dashboards with no direct download)
+data_available <- tryCatch({
+  enr <- fetch_enr_multi(max(min_year, max_year - 9):max_year)
+  enr_current <- fetch_enr(max_year)
+  TRUE
+}, error = function(e) {
+  message("Note: Maine DOE enrollment data is currently not available for automated download.")
+  message("Visualizations in this vignette require manually downloaded data.")
+  message("Use get_download_instructions() for guidance.")
+  FALSE
+})
+
+# If data not available, skip remaining chunks
+if (!data_available) {
+  knitr::opts_chunk$set(eval = FALSE)
+}
 ```
 
 ## 1. Maine is one of the whitest states in America

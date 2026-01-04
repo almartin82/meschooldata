@@ -9,6 +9,13 @@
 - [`get_available_years()`](https://almartin82.github.io/meschooldata/reference/get_available_years.md)
   : Get available years for Maine enrollment data
 
+## Manual Import
+
+- [`get_download_instructions()`](https://almartin82.github.io/meschooldata/reference/get_download_instructions.md)
+  : Get download instructions for Maine enrollment data
+- [`import_local_enrollment()`](https://almartin82.github.io/meschooldata/reference/import_local_enrollment.md)
+  : Import enrollment data from a local file
+
 ## Process & Tidy
 
 - [`tidy_enr()`](https://almartin82.github.io/meschooldata/reference/tidy_enr.md)

@@ -18,6 +18,11 @@ reference:
   - fetch_enr_multi
   - get_available_years
 
+- title: Manual Import
+  contents:
+  - get_download_instructions
+  - import_local_enrollment
+
 - title: Process & Tidy
   contents:
   - tidy_enr

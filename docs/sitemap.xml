@@ -3,6 +3,9 @@
 <url><loc>https://almartin82.github.io/meschooldata/CLAUDE.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/LICENSE-text.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/LICENSE.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/articles/enrollment-trends.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/articles/getting-started.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/articles/index.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/authors.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/index.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/cache_exists.html</loc></url>
@@ -12,6 +15,8 @@
 <url><loc>https://almartin82.github.io/meschooldata/reference/clear_cache.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/create_empty_enrollment_df.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/create_state_aggregate.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/create_state_from_districts.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/detect_year_from_data.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/download_maine_doe.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/enr_grade_aggs.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/fetch_enr.html</loc></url>
@@ -19,8 +24,10 @@
 <url><loc>https://almartin82.github.io/meschooldata/reference/get_available_years.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/get_cache_dir.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/get_cache_path.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/get_download_instructions.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/get_raw_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/id_enr_aggs.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/import_local_enrollment.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/index.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/meschooldata-package.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/parse_maine_doe_excel.html</loc></url>
@@ -28,8 +35,11 @@
 <url><loc>https://almartin82.github.io/meschooldata/reference/pipe.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/process_district_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/process_enr.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/process_local_data.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/process_school_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/read_cache.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/read_local_csv.html</loc></url>
+<url><loc>https://almartin82.github.io/meschooldata/reference/read_local_excel.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/safe_numeric.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/standardize_grade.html</loc></url>
 <url><loc>https://almartin82.github.io/meschooldata/reference/tidy_enr.html</loc></url>
