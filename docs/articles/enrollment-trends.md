@@ -1,32 +1,13 @@
----
-title: "Maine Enrollment Trends"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Maine Enrollment Trends}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
+# Maine Enrollment Trends
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10,
-  fig.height = 6,
-  out.width = "100%",
-  message = FALSE,
-  warning = FALSE
-)
-```
-
-```{r load-packages}
+``` r
 library(meschooldata)
 library(ggplot2)
 library(dplyr)
 library(scales)
 ```
 
-```{r theme}
+``` r
 theme_readme <- function() {
   theme_minimal(base_size = 14) +
     theme(
@@ -41,7 +22,7 @@ colors <- c("total" = "#2C3E50", "white" = "#3498DB", "black" = "#E74C3C",
             "hispanic" = "#F39C12", "asian" = "#9B59B6")
 ```
 
-```{r fetch-data, cache = TRUE, error = TRUE}
+``` r
 # Get available years
 years <- get_available_years()
 if (is.list(years)) {
@@ -73,9 +54,10 @@ if (!data_available) {
 
 ## 1. Maine is one of the whitest states in America
 
-Over 90% of Maine students are white - the highest percentage of any state east of the Mississippi.
+Over 90% of Maine students are white - the highest percentage of any
+state east of the Mississippi.
 
-```{r demographics}
+``` r
 demo <- enr_current %>%
   filter(is_state, grade_level == "TOTAL",
          subgroup %in% c("white", "black", "hispanic", "asian", "multiracial")) %>%
@@ -91,9 +73,10 @@ ggplot(demo, aes(x = subgroup_label, y = pct * 100)) +
 
 ## 2. Portland is diversifying rapidly
 
-Portland Public Schools looks nothing like the rest of Maine - over 40% students of color and growing.
+Portland Public Schools looks nothing like the rest of Maine - over 40%
+students of color and growing.
 
-```{r portland-diversity}
+``` r
 portland <- enr %>%
   filter(is_district, grepl("Portland", district_name, ignore.case = TRUE),
          grade_level == "TOTAL",
@@ -112,9 +95,10 @@ ggplot(portland, aes(x = end_year, y = pct * 100, color = subgroup)) +
 
 ## 3. Rural Maine is losing students fast
 
-Small SAUs in Aroostook County (the County) have lost 20-30% of enrollment since 2016.
+Small SAUs in Aroostook County (the County) have lost 20-30% of
+enrollment since 2016.
 
-```{r rural-decline}
+``` r
 state_trend <- enr %>%
   filter(is_state, grade_level == "TOTAL", subgroup == "total_enrollment")
 
@@ -130,9 +114,10 @@ ggplot(state_trend, aes(x = end_year, y = n_students)) +
 
 ## 4. Lewiston: Somali refugees transform a mill town
 
-Lewiston has become one of the most diverse cities in New England thanks to refugee resettlement.
+Lewiston has become one of the most diverse cities in New England thanks
+to refugee resettlement.
 
-```{r lewiston-refugees}
+``` r
 lewiston <- enr %>%
   filter(is_district, grepl("Lewiston", district_name, ignore.case = TRUE),
          grade_level == "TOTAL", subgroup == "black")
@@ -146,11 +131,12 @@ ggplot(lewiston, aes(x = end_year, y = pct * 100)) +
   theme_readme()
 ```
 
-## 5. COVID's kindergarten dip
+## 5. COVID’s kindergarten dip
 
-Maine lost nearly 10% of kindergartners in 2021 - families kept kids home an extra year.
+Maine lost nearly 10% of kindergartners in 2021 - families kept kids
+home an extra year.
 
-```{r covid-k}
+``` r
 k_trend <- enr %>%
   filter(is_state, subgroup == "total_enrollment",
          grade_level %in% c("K", "01", "06", "12")) %>%
@@ -174,9 +160,10 @@ ggplot(k_trend, aes(x = end_year, y = n_students, color = grade_label)) +
 
 ## 6. Southern Maine is growing
 
-Cumberland and York counties are gaining students while the rest of the state declines.
+Cumberland and York counties are gaining students while the rest of the
+state declines.
 
-```{r southern-growth}
+``` r
 southern <- c("Portland", "South Portland", "Scarborough", "Falmouth")
 south_trend <- enr %>%
   filter(is_district, grepl(paste(southern, collapse = "|"), district_name, ignore.case = TRUE),
@@ -196,9 +183,10 @@ ggplot(south_trend, aes(x = end_year, y = n_students)) +
 
 ## 7. Many SAUs have fewer than 500 students
 
-Maine has more tiny school districts than almost any other state - some with under 100 students.
+Maine has more tiny school districts than almost any other state - some
+with under 100 students.
 
-```{r district-sizes}
+``` r
 sizes <- enr_current %>%
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
   mutate(size = case_when(
@@ -221,9 +209,10 @@ ggplot(sizes, aes(x = size, y = n_districts)) +
 
 ## 8. Bangor is stable in a declining region
 
-Bangor maintains steady enrollment while surrounding Penobscot County shrinks.
+Bangor maintains steady enrollment while surrounding Penobscot County
+shrinks.
 
-```{r bangor-stable}
+``` r
 bangor <- enr %>%
   filter(is_district, grepl("Bangor", district_name, ignore.case = TRUE),
          subgroup == "total_enrollment", grade_level == "TOTAL")
@@ -240,9 +229,10 @@ ggplot(bangor, aes(x = end_year, y = n_students)) +
 
 ## 9. English learners concentrated in a few districts
 
-Portland, Lewiston, and a handful of other districts serve the vast majority of Maine's EL students.
+Portland, Lewiston, and a handful of other districts serve the vast
+majority of Maine’s EL students.
 
-```{r el-concentration}
+``` r
 el <- enr_current %>%
   filter(is_district, subgroup == "lep", grade_level == "TOTAL") %>%
   arrange(desc(n_students)) %>%
@@ -261,9 +251,10 @@ ggplot(el, aes(x = district_label, y = n_students)) +
 
 ## 10. The graying of Maine shows in the schools
 
-Maine's population is aging faster than any other state - and schools are feeling it first.
+Maine’s population is aging faster than any other state - and schools
+are feeling it first.
 
-```{r statewide-trend}
+``` r
 ggplot(state_trend, aes(x = end_year, y = n_students)) +
   geom_line(linewidth = 1.5, color = colors["total"]) +
   geom_point(size = 3, color = colors["total"]) +

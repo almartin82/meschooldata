@@ -3,6 +3,8 @@
 **[Documentation](https://almartin82.github.io/meschooldata/)** \|
 **[Getting
 Started](https://almartin82.github.io/meschooldata/articles/quickstart.html)**
+\| **[Enrollment
+Trends](https://almartin82.github.io/meschooldata/articles/enrollment-trends.html)**
 
 Fetch and analyze Maine school enrollment data from the Maine Department
 of Education (DOE) Data Warehouse in R or Python.
@@ -10,220 +12,31 @@ of Education (DOE) Data Warehouse in R or Python.
 ## What can you find with meschooldata?
 
 **10 years of enrollment data (2016-2025).** 175,000 students. 260+
-School Administrative Units. Here are ten stories hiding in the numbers:
-
-------------------------------------------------------------------------
-
-### 1. Maine is one of the whitest states in America
-
-Over 90% of Maine students are white - the highest percentage of any
-state east of the Mississippi.
-
-``` r
-library(meschooldata)
-library(dplyr)
-
-enr_2025 <- fetch_enr(2025)
-
-enr_2025 %>%
-  filter(is_state, grade_level == "TOTAL",
-         subgroup %in% c("white", "black", "hispanic", "asian", "multiracial")) %>%
-  mutate(pct = round(pct * 100, 1)) %>%
-  select(subgroup, n_students, pct) %>%
-  arrange(desc(pct))
-```
-
-![Demographics](reference/figures/demographics.png)
-
-Demographics
-
-------------------------------------------------------------------------
-
-### 2. Portland is diversifying rapidly
-
-Portland Public Schools looks nothing like the rest of Maine - over 40%
-students of color and growing.
-
-``` r
-enr <- fetch_enr_multi(2016:2025)
-
-enr %>%
-  filter(is_district, grepl("Portland", district_name),
-         grade_level == "TOTAL",
-         subgroup %in% c("white", "black", "hispanic", "asian")) %>%
-  filter(end_year %in% c(2016, 2020, 2025)) %>%
-  mutate(pct = round(pct * 100, 1)) %>%
-  select(end_year, subgroup, pct)
-```
-
-![Portland diversity](reference/figures/portland-diversity.png)
-
-Portland diversity
-
-------------------------------------------------------------------------
-
-### 3. Rural Maine is losing students fast
-
-Small SAUs in Aroostook County (the County) have lost 20-30% of
-enrollment since 2016.
-
-``` r
-enr %>%
-  filter(is_district, end_year %in% c(2016, 2025),
-         subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  group_by(district_name) %>%
-  filter(n() == 2) %>%
-  summarize(
-    n_2016 = n_students[end_year == 2016],
-    n_2025 = n_students[end_year == 2025],
-    pct_change = round((n_2025 / n_2016 - 1) * 100, 1)
-  ) %>%
-  arrange(pct_change) %>%
-  head(10)
-```
-
-![Rural decline](reference/figures/rural-decline.png)
-
-Rural decline
-
-------------------------------------------------------------------------
-
-### 4. Lewiston: Somali refugees transform a mill town
-
-Lewiston has become one of the most diverse cities in New England thanks
-to refugee resettlement.
-
-``` r
-enr %>%
-  filter(is_district, grepl("Lewiston", district_name),
-         grade_level == "TOTAL", subgroup == "black") %>%
-  mutate(pct = round(pct * 100, 1)) %>%
-  select(end_year, n_students, pct)
-```
-
-![Lewiston transformation](reference/figures/lewiston-refugees.png)
-
-Lewiston transformation
-
-------------------------------------------------------------------------
-
-### 5. COVID’s kindergarten dip
-
-Maine lost nearly 10% of kindergartners in 2021 - families kept kids
-home an extra year.
-
-``` r
-enr %>%
-  filter(is_state, subgroup == "total_enrollment",
-         grade_level %in% c("K", "01", "06", "12")) %>%
-  select(end_year, grade_level, n_students)
-```
-
-![COVID kindergarten](reference/figures/covid-k.png)
-
-COVID kindergarten
-
-------------------------------------------------------------------------
-
-### 6. Southern Maine is growing
-
-Cumberland and York counties are gaining students while the rest of the
-state declines.
-
-``` r
-# Compare southern vs northern Maine
-enr %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         grepl("Portland|South Portland|Scarborough|Falmouth|Cape Elizabeth", district_name)) %>%
-  group_by(end_year) %>%
-  summarize(southern = sum(n_students, na.rm = TRUE))
-```
-
-![Southern growth](reference/figures/southern-growth.png)
-
-Southern growth
-
-------------------------------------------------------------------------
-
-### 7. Many SAUs have fewer than 500 students
-
-Maine has more tiny school districts than almost any other state - some
-with under 100 students.
-
-``` r
-enr_2025 %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  mutate(size = case_when(
-    n_students < 100 ~ "Under 100",
-    n_students < 500 ~ "100-499",
-    n_students < 1000 ~ "500-999",
-    n_students < 5000 ~ "1,000-4,999",
-    TRUE ~ "5,000+"
-  )) %>%
-  group_by(size) %>%
-  summarize(n_districts = n())
-```
-
-![District sizes](reference/figures/district-sizes.png)
-
-District sizes
-
-------------------------------------------------------------------------
-
-### 8. Bangor is stable in a declining region
-
-Bangor maintains steady enrollment while surrounding Penobscot County
-shrinks.
-
-``` r
-enr %>%
-  filter(is_district, grepl("Bangor", district_name),
-         subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  select(end_year, district_name, n_students)
-```
-
-![Bangor stability](reference/figures/bangor-stable.png)
-
-Bangor stability
-
-------------------------------------------------------------------------
-
-### 9. English learners concentrated in a few districts
-
-Portland, Lewiston, and a handful of other districts serve the vast
-majority of Maine’s EL students.
-
-``` r
-enr_2025 %>%
-  filter(is_district, subgroup == "lep", grade_level == "TOTAL") %>%
-  arrange(desc(n_students)) %>%
-  select(district_name, n_students, pct) %>%
-  head(10)
-```
-
-![EL concentration](reference/figures/el-concentration.png)
-
-EL concentration
-
-------------------------------------------------------------------------
-
-### 10. The graying of Maine shows in the schools
-
-Maine’s population is aging faster than any other state - and schools
-are feeling it first.
-
-``` r
-enr %>%
-  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  select(end_year, n_students) %>%
-  mutate(change = n_students - lag(n_students))
-```
-
-![Statewide enrollment](reference/figures/statewide-trend.png)
-
-Statewide enrollment
-
-------------------------------------------------------------------------
+School Administrative Units. Here are ten stories hiding in the numbers
+(see [Enrollment
+Trends](https://almartin82.github.io/meschooldata/articles/enrollment-trends.html)
+for visualizations):
+
+1.  **Maine is one of the whitest states in America** - Over 90% of
+    students are white, the highest east of the Mississippi
+2.  **Portland is diversifying rapidly** - Over 40% students of color,
+    unlike the rest of Maine
+3.  **Rural Maine is losing students fast** - Aroostook County SAUs down
+    20-30% since 2016
+4.  **Lewiston: Somali refugees transform a mill town** - One of the
+    most diverse cities in New England
+5.  **COVID’s kindergarten dip** - Maine lost nearly 10% of
+    kindergartners in 2021
+6.  **Southern Maine is growing** - Cumberland and York counties gaining
+    while the rest declines
+7.  **Many SAUs have fewer than 500 students** - Maine’s fragmented
+    district structure
+8.  **Bangor is stable in a declining region** - Maintains enrollment
+    while Penobscot County shrinks
+9.  **English learners concentrated in a few districts** - Portland and
+    Lewiston serve the vast majority
+10. **The graying of Maine shows in the schools** - Population aging
+    faster than any other state
 
 ## Installation
 
@@ -357,6 +170,13 @@ MIT
 - [`get_available_years()`](https://almartin82.github.io/meschooldata/reference/get_available_years.md)
   : Get available years for Maine enrollment data
 
+## Manual Import
+
+- [`get_download_instructions()`](https://almartin82.github.io/meschooldata/reference/get_download_instructions.md)
+  : Get download instructions for Maine enrollment data
+- [`import_local_enrollment()`](https://almartin82.github.io/meschooldata/reference/import_local_enrollment.md)
+  : Import enrollment data from a local file
+
 ## Process & Tidy
 
 - [`tidy_enr()`](https://almartin82.github.io/meschooldata/reference/tidy_enr.md)
@@ -373,3 +193,11 @@ MIT
 - [`clear_cache()`](https://almartin82.github.io/meschooldata/reference/clear_cache.md)
   : Clear the meschooldata cache
 
+# Articles
+
+### All vignettes
+
+- [Maine Enrollment
+  Trends](https://almartin82.github.io/meschooldata/articles/enrollment-trends.md):
+- [Getting Started with
+  meschooldata](https://almartin82.github.io/meschooldata/articles/getting-started.md):

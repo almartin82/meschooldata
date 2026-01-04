@@ -240,7 +240,7 @@ process_district_enr <- function(df, end_year) {
   }
 
   # Total enrollment
-  total_col <- find_col(c("TOTAL", "total", "MEMBER", "enrollment", "ENROLLMENT"))
+  total_col <- find_col(c("TOTAL", "total", "MEMBER", "enrollment", "ENROLLMENT", "row_total"))
   if (!is.null(total_col)) {
     result$row_total <- safe_numeric(df[[total_col]])
   } else {
@@ -284,20 +284,20 @@ process_district_enr <- function(df, end_year) {
 
   # Grade levels
   grade_map <- list(
-    grade_pk = c("PK", "pk", "PREKINDERGARTEN"),
-    grade_k = c("KG", "kg", "K", "KINDERGARTEN"),
-    grade_01 = c("G01", "g01", "GRADE_1"),
-    grade_02 = c("G02", "g02", "GRADE_2"),
-    grade_03 = c("G03", "g03", "GRADE_3"),
-    grade_04 = c("G04", "g04", "GRADE_4"),
-    grade_05 = c("G05", "g05", "GRADE_5"),
-    grade_06 = c("G06", "g06", "GRADE_6"),
-    grade_07 = c("G07", "g07", "GRADE_7"),
-    grade_08 = c("G08", "g08", "GRADE_8"),
-    grade_09 = c("G09", "g09", "GRADE_9"),
-    grade_10 = c("G10", "g10", "GRADE_10"),
-    grade_11 = c("G11", "g11", "GRADE_11"),
-    grade_12 = c("G12", "g12", "GRADE_12")
+    grade_pk = c("PK", "pk", "PREKINDERGARTEN", "grade_pk"),
+    grade_k = c("KG", "kg", "K", "KINDERGARTEN", "grade_k"),
+    grade_01 = c("G01", "g01", "GRADE_1", "grade_01"),
+    grade_02 = c("G02", "g02", "GRADE_2", "grade_02"),
+    grade_03 = c("G03", "g03", "GRADE_3", "grade_03"),
+    grade_04 = c("G04", "g04", "GRADE_4", "grade_04"),
+    grade_05 = c("G05", "g05", "GRADE_5", "grade_05"),
+    grade_06 = c("G06", "g06", "GRADE_6", "grade_06"),
+    grade_07 = c("G07", "g07", "GRADE_7", "grade_07"),
+    grade_08 = c("G08", "g08", "GRADE_8", "grade_08"),
+    grade_09 = c("G09", "g09", "GRADE_9", "grade_09"),
+    grade_10 = c("G10", "g10", "GRADE_10", "grade_10"),
+    grade_11 = c("G11", "g11", "GRADE_11", "grade_11"),
+    grade_12 = c("G12", "g12", "GRADE_12", "grade_12")
   )
 
   for (name in names(grade_map)) {

@@ -81,6 +81,8 @@ Data is sourced exclusively from the Maine DOE Data Warehouse:
 
 Useful links:
 
+- <https://almartin82.github.io/meschooldata>
+
 - <https://github.com/almartin82/meschooldata>
 
 - Report bugs at <https://github.com/almartin82/meschooldata/issues>
